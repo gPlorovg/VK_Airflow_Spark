@@ -1,7 +1,7 @@
 from datetime import timedelta
 from airflow import DAG
 from airflow.utils.dates import days_ago
-from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
+from airflow.operators.bash import BashOperator
 
 default_args = {
     "owner": "airflow",
@@ -21,17 +21,12 @@ dag = DAG(
     catchup=False,
 )
 
-run_weekly_aggregation = SparkSubmitOperator(
-    task_id='run_weekly_aggregation',
-    application='weekly_aggregation.py',
-    conn_id='spark_default',
-    verbose=True,
-    application_args=[
-        "--execution_date", "{{ ds }}",
-        "--input_path", "./input/",
-        "--output_path", "./output/",
-        "--daily_path", "./daily/",
-    ],
-    trigger_rule="all_done",
+run_weekly_aggregation = BashOperator(
+    task_id="run_weekly_aggregation",
+    bash_command="spark-submit --master local /opt/airflow/dags/weekly_aggregation.py"
+                 " --execution_date {{ ds }}"
+                 " --input_path /opt/airflow/input"
+                 " --output_path /opt/airflow/output"
+                 " --daily_path /opt/airflow/daily",
     dag=dag,
 )
