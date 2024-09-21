@@ -1,5 +1,6 @@
 from datetime import timedelta
 from airflow import DAG
+from airflow.utils.dates import days_ago
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 
 default_args = {
@@ -12,10 +13,12 @@ default_args = {
 }
 
 dag = DAG(
-    'spark_weekly_aggregation_dag',
+    "spark_weekly_aggregation_dag",
     default_args=default_args,
-    description='DAG для подсчёта количества CRUD действий пользователей за неделю',
-    schedule_interval='0 7 * * *',
+    description="DAG для подсчёта количества CRUD действий пользователей за неделю",
+    schedule_interval="0 7 * * *",
+    start_date=days_ago(1),
+    catchup=False,
 )
 
 run_weekly_aggregation = SparkSubmitOperator(
