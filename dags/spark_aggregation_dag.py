@@ -1,7 +1,6 @@
 from datetime import timedelta
 from airflow import DAG
-from airflow.utils.dates import days_ago
-from airflow.providers.apache.spark import SparkSubmitOperator
+from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 
 default_args = {
     'owner': 'airflow',
