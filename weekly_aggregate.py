@@ -4,7 +4,7 @@ from os.path import isfile
 
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType, TimestampType, LongType
-from pyspark.sql.functions import count, col
+from pyspark.sql.functions import count, col, sum
 
 parser = ArgumentParser(description="date of start | input path| output path| daily path")
 
@@ -56,3 +56,15 @@ for name in last_week_daily_files:
             aggregate_daily(spark, raw_data_schema, args.input_path, args.daily_path, name)
         else:
             raise FileNotFoundError(f"No file named {name} in input directory {args.input_path}")
+
+last_week_daily_path = [args.daily_path + name for name in last_week_daily_files]
+
+df = spark.read.csv(path=last_week_daily_path, schema=daily_data_schema, header=True)
+df.groupBy("email")\
+    .agg(
+        sum(col("create_count")).alias("create_count"),
+        sum(col("read_count")).alias("read_count"),
+        sum(col("update_count")).alias("update_count"),
+        sum(col("delete_count")).alias("delete_count"),
+    )\
+    .coalesce(1).write.csv(path=args.output_path + start_date.strftime("%Y-%m-%d.csv"), header=True)
