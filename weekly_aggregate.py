@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType, TimestampType, LongType
+from pyspark.sql.functions import count, col
 
 parser = ArgumentParser(description="date of start | input path| output path| daily path")
 
@@ -31,3 +32,19 @@ daily_data_schema = StructType([
     StructField("update_count", LongType()),
     StructField("delete_count", LongType()),
 ])
+
+
+def aggregate_daily(sp:SparkSession, schema: StructType, input_path: str, output_path: str, name: str):
+    df = sp.read.csv(path=input_path + name, schema=schema, header=False)
+    df.groupBy("email")\
+        .pivot("crud")\
+        .count()\
+        .select(
+            col("email"),
+            col("CREATE").alias("create_count"),
+            col("READ").alias("read_count"),
+            col("UPDATE").alias("update_count"),
+            col("DELETE").alias("delete_count"),
+        )\
+        .coalesce(1).write.csv(path=output_path+name, header=True)
+
