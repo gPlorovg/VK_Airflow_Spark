@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
+from os.path import isfile
 
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType, TimestampType, LongType
@@ -48,3 +49,10 @@ def aggregate_daily(sp:SparkSession, schema: StructType, input_path: str, output
         )\
         .coalesce(1).write.csv(path=output_path+name, header=True)
 
+
+for name in last_week_daily_files:
+    if not isfile(args.daily_path + name):
+        if isfile(args.input_path + name):
+            aggregate_daily(spark, raw_data_schema, args.input_path, args.daily_path, name)
+        else:
+            raise FileNotFoundError(f"No file named {name} in input directory {args.input_path}")
