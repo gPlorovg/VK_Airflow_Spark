@@ -4,7 +4,7 @@ from os.path import isfile
 
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType, TimestampType, LongType
-from pyspark.sql.functions import count, col, sum
+from pyspark.sql.functions import col, sum
 
 parser = ArgumentParser(description="date of start | input path| output path| daily path")
 
