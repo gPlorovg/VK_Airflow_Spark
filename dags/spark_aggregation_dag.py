@@ -26,7 +26,12 @@ run_weekly_aggregation = SparkSubmitOperator(
     application='weekly_aggregation.py',
     conn_id='spark_default',
     verbose=True,
-    application_args=['{{ ds }}'],
-    trigger_rule='all_done',
+    application_args=[
+        "--execution_date", "{{ ds }}",
+        "--input_path", "./input/",
+        "--output_path", "./output/",
+        "--daily_path", "./daily/",
+    ],
+    trigger_rule="all_done",
     dag=dag,
 )
