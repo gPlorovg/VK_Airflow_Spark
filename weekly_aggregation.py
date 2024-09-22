@@ -47,7 +47,7 @@ def aggregate_daily(sp:SparkSession, schema: StructType, input_path: str, output
             col("UPDATE").alias("update_count"),
             col("DELETE").alias("delete_count"),
         )\
-        .coalesce(1).write.csv(path=output_path+name, header=True)
+        .coalesce(1).write.csv(path=output_path+name, header=True, mode="overwrite")
 
 
 for name in last_week_daily_files:
@@ -67,4 +67,4 @@ df.groupBy("email")\
         sum(col("update_count")).alias("update_count"),
         sum(col("delete_count")).alias("delete_count"),
     )\
-    .coalesce(1).write.csv(path=args.output_path + start_date.strftime("%Y-%m-%d.csv"), header=True)
+    .coalesce(1).write.csv(path=args.output_path + start_date.strftime("%Y-%m-%d.csv"), header=True, mode="overwrite")
