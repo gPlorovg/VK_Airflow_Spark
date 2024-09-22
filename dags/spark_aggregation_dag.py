@@ -25,8 +25,8 @@ run_weekly_aggregation = BashOperator(
     task_id="run_weekly_aggregation",
     bash_command="spark-submit --master local /opt/airflow/dags/weekly_aggregation.py"
                  " --execution_date {{ ds }}"
-                 " --input_path /opt/airflow/input"
-                 " --output_path /opt/airflow/output"
-                 " --daily_path /opt/airflow/daily",
+                 " --input_path /opt/airflow/input/"
+                 " --output_path /opt/airflow/output/"
+                 " --daily_path /opt/airflow/daily/",
     dag=dag,
 )
